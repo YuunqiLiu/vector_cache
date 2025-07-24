@@ -117,7 +117,7 @@ module sram_2inst
 
 
     always_comb begin
-        if (read_sel) begin
+        if (read_sel_d) begin
             rd_data_a = sram1_rd_data;
             rd_data_b = sram2_rd_data;
         end else begin

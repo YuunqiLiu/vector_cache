@@ -24,13 +24,13 @@ module sram_inst
     logic   [1      :0]     rd_byte_sel_d   ;
     logic                   rd_mode_d       ;
     logic   [8      :0]     addr            ;
-    logic                   rd_opcode       ;
-    logic                   wr_opcode       ;
-    logic   [1      :0]     linefill_num    ;   // linefill write时的传输次数编号
-    logic   [1      :0]     evict_num       ;   // evict read时的传输次数编号
+    //logic                   rd_opcode       ;
+    //logic                   wr_opcode       ;
+    //logic   [1      :0]     linefill_num    ;   // linefill write时的传输次数编号
+    //logic   [1      :0]     evict_num       ;   // evict read时的传输次数编号
 
-    assign linefill_num = write_cmd.req_num; //linefill write时的传输次数编号
-    assign evict_num    = read_cmd.req_num ; //evict read时的传输次数编号
+    //assign linefill_num = write_cmd.req_num; //linefill write时的传输次数编号
+    //assign evict_num    = read_cmd.req_num ; //evict read时的传输次数编号
     // enable  
     assign en          = write_vld | read_vld     ;
     assign wr_en       = write_vld                ;
@@ -38,8 +38,8 @@ module sram_inst
     assign wr_mode     = write_cmd.mode           ;//mode=0,读写连续的32bit; mode=1 每32bit中读一个byte
     assign rd_byte_sel = read_cmd.byte_sel        ;
     assign rd_mode     = read_cmd.mode            ;//mode=0,读写连续的32bit; mode=1 每32bit中读一个byte
-    assign wr_opcode   = write_cmd.opcode         ;//opcode=0,normal write; opcode=1,linefill write
-    assign rd_opcode   = read_cmd.opcode          ;//opcode=0,normal read; opcode=1,evict read
+//    assign wr_opcode   = write_cmd.opcode         ;//opcode=0,normal write; opcode=1,linefill write
+//    assign rd_opcode   = read_cmd.opcode          ;//opcode=0,normal read; opcode=1,evict read
     assign addr        = write_vld ? write_cmd.addr : read_cmd.addr;
 
     mem_model #(
@@ -57,9 +57,8 @@ module sram_inst
 
     // 写
     always_comb begin
-        byte_wr_en  = 16'b0;
-        ram_wr_data = 128'b0;
-        if (write_vld && wr_opcode==1'b0) begin//normal write
+        //byte_wr_en  = 16'b0;
+        //ram_wr_data = 128'b0;
             if (wr_mode == 1'b0) begin//读写连续的32bit
                 case (wr_byte_sel)
                     2'b00: begin
@@ -133,31 +132,7 @@ module sram_inst
                 endcase
             end
         end
-        else if(write_vld && wr_opcode==1'b1)begin//linefill write
-            case (linefill_num)
-                2'b00: begin
-                    byte_wr_en[3:0]    = 4'b1111;
-                    ram_wr_data[31:0]  = wr_data;
-                end
-                2'b01: begin
-                    byte_wr_en[7:4]    = 4'b1111;
-                    ram_wr_data[63:32] = wr_data;
-                end
-                2'b10: begin
-                    byte_wr_en[11:8]   = 4'b1111;
-                    ram_wr_data[95:64] = wr_data;
-                end
-                2'b11: begin
-                    byte_wr_en[15:12]  = 4'b1111;
-                    ram_wr_data[127:96]= wr_data;
-                end
-                default: begin
-                    byte_wr_en  = 16'b0;
-                    ram_wr_data = 128'b0;
-                end
-            endcase
-        end
-    end
+
 
     // 读 
     //因为读数据下一拍出，所以要把选择信号打一拍，用于选择读数据
@@ -175,37 +150,36 @@ module sram_inst
     end
 
     always_comb begin
-        rd_data = 32'b0;
-        if (read_vld_d && rd_opcode==1'b0) begin//normal read
-            if (rd_mode_d == 1'b0) begin
-                case (rd_byte_sel_d)
-                    2'b00: rd_data   = ram_rd_data[31:0]  ;
-                    2'b01: rd_data   = ram_rd_data[63:32] ;
-                    2'b10: rd_data   = ram_rd_data[95:64] ;
-                    2'b11: rd_data   = ram_rd_data[127:96];
-                    default: rd_data = 32'b0;
-                endcase
-            end 
-            else if(rd_mode_d==1'b1)begin
-                case (rd_byte_sel_d)
-                    2'b00: rd_data   = {ram_rd_data[103:96], ram_rd_data[71:64], ram_rd_data[39:32], ram_rd_data[7:0]};
-                    2'b01: rd_data   = {ram_rd_data[111:104], ram_rd_data[79:72], ram_rd_data[47:40], ram_rd_data[15:8]};
-                    2'b10: rd_data   = {ram_rd_data[119:112], ram_rd_data[87:80], ram_rd_data[55:48], ram_rd_data[23:16]};
-                    2'b11: rd_data   = {ram_rd_data[127:120], ram_rd_data[95:88], ram_rd_data[63:56], ram_rd_data[31:24]};
-                    default: rd_data = 32'b0;
-                endcase
-            end
-        end
-        else if(read_vld && rd_opcode==1'b1)begin//evict read
-            case (evict_num)
+        //rd_data = 32'b0;
+        //if (read_vld_d) begin//normal read
+        if (rd_mode_d == 1'b0) begin
+            case (rd_byte_sel_d)
                 2'b00: rd_data   = ram_rd_data[31:0]  ;
                 2'b01: rd_data   = ram_rd_data[63:32] ;
                 2'b10: rd_data   = ram_rd_data[95:64] ;
                 2'b11: rd_data   = ram_rd_data[127:96];
                 default: rd_data = 32'b0;
             endcase
+        end 
+        else if(rd_mode_d==1'b1)begin
+            case (rd_byte_sel_d)
+                2'b00: rd_data   = {ram_rd_data[103:96], ram_rd_data[71:64], ram_rd_data[39:32], ram_rd_data[7:0]};
+                2'b01: rd_data   = {ram_rd_data[111:104], ram_rd_data[79:72], ram_rd_data[47:40], ram_rd_data[15:8]};
+                2'b10: rd_data   = {ram_rd_data[119:112], ram_rd_data[87:80], ram_rd_data[55:48], ram_rd_data[23:16]};
+                2'b11: rd_data   = {ram_rd_data[127:120], ram_rd_data[95:88], ram_rd_data[63:56], ram_rd_data[31:24]};
+                default: rd_data = 32'b0;
+            endcase
         end
     end
+        //else if(read_vld && rd_opcode==1'b1)begin//evict read
+        //    case (evict_num)
+        //        2'b00: rd_data   = ram_rd_data[31:0]  ;
+        //        2'b01: rd_data   = ram_rd_data[63:32] ;
+        //        2'b10: rd_data   = ram_rd_data[95:64] ;
+        //        2'b11: rd_data   = ram_rd_data[127:96];
+        //        default: rd_data = 32'b0;
+        //    endcase
+        //end
 
     
 

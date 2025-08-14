@@ -30,19 +30,19 @@ module vcache_channel_shift_reg
         end                 
         else begin
             channel_shift_reg <= {1'b0, channel_shift_reg[CHANNEL_SHIFT_REG_WIDTH-1:1]};
-            if(w_write_en)begin
+            if(update_en_w)begin
                 channel_shift_reg[WR_CMD_DELAY_WEST]  <= 1'b1;
             end
-            if(e_write_en)begin
+            if(update_en_e)begin
                 channel_shift_reg[WR_CMD_DELAY_EAST]  <= 1'b1;
             end   
-            if(s_write_en)begin
+            if(update_en_s)begin
                 channel_shift_reg[WR_CMD_DELAY_SOUTH] <= 1'b1;
             end   
-            if(n_write_en)begin
+            if(update_en_n)begin
                 channel_shift_reg[WR_CMD_DELAY_NORTH] <= 1'b1;
             end   
-            if(lf_write_en)begin
+            if(update_en_lf)begin
                 channel_shift_reg[WR_CMD_DELAY_LINEFILL] <= 1'b1;
             end   
         end

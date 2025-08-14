@@ -540,8 +540,7 @@ module vec_cache_mshr
         .arbout_e_dataram_wr_pld(east_write_cmd_pld ),
         .arbout_s_dataram_wr_pld(south_write_cmd_pld),
         .arbout_n_dataram_wr_pld(north_write_cmd_pld),
-        .arbout_linefill_req_pld(lf_wrreq_pld       ),
-        .arb_rdy                (1'b1               ));
+        .arbout_linefill_req_pld(lf_wrreq_pld       ));
     
 endmodule
 

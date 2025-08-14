@@ -31,19 +31,19 @@ module vcache_ram_shift_reg
         end                 
         else begin
             ram_shift_reg <= {1'b0, ram_shift_reg[RAM_SHIFT_REG_WIDTH-1:1]};
-            if(w_sr_update_en)begin
+            if(update_en_w)begin
                 ram_shift_reg[WR_CMD_DELAY_WEST + RAM_BLOCK_WRITE_DELAY]  <= 1'b1;
             end
-            if(e_sr_update_en)begin
+            if(update_en_e)begin
                 ram_shift_reg[WR_CMD_DELAY_EAST + RAM_BLOCK_WRITE_DELAY]  <= 1'b1;
             end   
-            if(s_sr_update_en)begin
+            if(update_en_s)begin
                 ram_shift_reg[WR_CMD_DELAY_SOUTH + RAM_BLOCK_WRITE_DELAY] <= 1'b1;
             end   
-            if(n_sr_update_en)begin
+            if(update_en_n)begin
                 ram_shift_reg[WR_CMD_DELAY_NORTH + RAM_BLOCK_WRITE_DELAY] <= 1'b1;
             end   
-            if(lf_sr_update_en)begin
+            if(update_en_lf)begin
                 ram_shift_reg[WR_CMD_DELAY_LINEFILL + RAM_BLOCK_WRITE_DELAY] <= 1'b1;
             end   
         end
